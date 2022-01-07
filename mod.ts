@@ -22,6 +22,11 @@ router.get("*", async (_: Request) => {
 });
 
 // @ts-ignore The method is not defined in types
+router.post("/hook/:id", (_: Request) => {
+  return new Response("hook", { status: 200 });
+})
+
+// @ts-ignore The method is not defined in types
 router.all("*", () => new Response("Not Found.", { status: 404 }));
 
 // @ts-ignore The method is not defined in types

@@ -1,3 +1,5 @@
+import { DOMAIN, PAYEE } from "./secrets.ts";
+
 export async function CreateSwishPayment(params: {
   message: string;
   amount: string;
@@ -15,8 +17,8 @@ export async function CreateSwishPayment(params: {
 
   const data = {
     payeePaymentReference: params.reference,
-    callbackUrl: "https://example.com/swishcallback",
-    payeeAlias: "1231181189",
+    callbackUrl: `https://${DOMAIN}/hook/123`,
+    payeeAlias: PAYEE,
     currency: "SEK",
     payerAlias: params.payer,
     amount: params.amount,
