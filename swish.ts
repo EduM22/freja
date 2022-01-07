@@ -1,4 +1,5 @@
-import { DOMAIN, PAYEE } from "./secrets.ts";
+import { encode } from "./deps.ts";
+import { DOMAIN, PAYEE, SHARED_SECRET } from "./secrets.ts";
 
 export async function CreateSwishPayment(params: {
   message: string;
@@ -15,17 +16,34 @@ export async function CreateSwishPayment(params: {
     privateKey: privateKey,
   });
 
+  const id = crypto.randomUUID();
+  const instructionId = id.replaceAll("-", "").toUpperCase();
+
+  const encodedData = new TextEncoder().encode(JSON.stringify({
+    id: instructionId,
+  }));
+  const encoded = encode(encodedData);
+  const encDataNSecret = encode(new TextEncoder().encode(encoded + SHARED_SECRET));
+
+  const hashBuffer = new Uint8Array(
+    await crypto.subtle.digest(
+      "SHA-512",
+      new TextEncoder().encode(encDataNSecret),
+    ),
+  )
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); 
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
   const data = {
     payeePaymentReference: params.reference,
-    callbackUrl: `https://${DOMAIN}/hook/123`,
+    callbackUrl: `https://${DOMAIN}/hook/${hashHex}`,
     payeeAlias: PAYEE,
     currency: "SEK",
     payerAlias: params.payer,
     amount: params.amount,
     message: params.message,
   };
-
-  const instructionId = "29A86BE70EA346E4B1C39C874173F022";
 
   const response = await fetch(
     `https://mss.cpc.getswish.net/swish-cpcapi/api/v2/paymentrequests/${instructionId}`,

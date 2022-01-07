@@ -38,8 +38,4 @@ if (env == "prod") {
   }
 }
 
-export {
-  DOMAIN,
-  PAYEE,
-  SHARED_SECRET
-};
+export { DOMAIN, PAYEE, SHARED_SECRET };
