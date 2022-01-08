@@ -23,17 +23,21 @@ export async function CreateSwishPayment(params: {
     id: instructionId,
   }));
   const encoded = encode(encodedData);
-  const encDataNSecret = encode(new TextEncoder().encode(encoded + SHARED_SECRET));
+  const encDataNSecret = encode(
+    new TextEncoder().encode(encoded + SHARED_SECRET),
+  );
 
   const hashBuffer = new Uint8Array(
     await crypto.subtle.digest(
       "SHA-512",
       new TextEncoder().encode(encDataNSecret),
     ),
-  )
+  );
 
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); 
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(
+    "",
+  );
 
   const data = {
     payeePaymentReference: params.reference,

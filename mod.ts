@@ -1,7 +1,6 @@
-import { serve } from "https://deno.land/std@0.120.0/http/mod.ts";
-import { Router } from "https://cdn.skypack.dev/itty-router?dts";
-
 import { CreateSwishPayment } from "./swish.ts";
+import { encode, Router, serve } from "./deps.ts";
+import { SHARED_SECRET } from "./secrets.ts";
 
 const router = Router();
 
@@ -22,8 +21,42 @@ router.get("*", async (_: Request) => {
 });
 
 // @ts-ignore The method is not defined in types
-router.post("/hook/:id", (_: Request) => {
-  return new Response("hook", { status: 200 });
+router.post("/hook/:id", async (req: Request) => {
+  try {
+    await req.json();
+
+    // @ts-expect-error not on Request
+    const { id } = req.params;
+
+    const instructionId = "";
+    const encodedData = new TextEncoder().encode(JSON.stringify({
+      id: instructionId,
+    }));
+    const encoded = encode(encodedData);
+    const encDataNSecret = encode(
+      new TextEncoder().encode(encoded + SHARED_SECRET),
+    );
+
+    const hashBuffer = new Uint8Array(
+      await crypto.subtle.digest(
+        "SHA-512",
+        new TextEncoder().encode(encDataNSecret),
+      ),
+    );
+
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(
+      "",
+    );
+
+    if (id !== hashHex) {
+      throw new Error("Not same hash");
+    }
+
+    return new Response("hook", { status: 200 });
+  } catch (error) {
+    return new Response(`error ${JSON.stringify(error)}`, { status: 500 });
+  }
 });
 
 // @ts-ignore The method is not defined in types
