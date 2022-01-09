@@ -1,7 +1,7 @@
 import { CreateSwishPayment } from "./swish.ts";
 import { encode, Router, serve } from "./deps.ts";
 import { SHARED_SECRET } from "./secrets.ts";
-import { SwishCallbackResponse, SwishRequest } from "./types.ts";
+import { SwishCallbackResponse, SwishRequest, swishSchema } from "./utils.ts";
 
 const router = Router();
 
@@ -9,6 +9,8 @@ const router = Router();
 router.post("/pay", async (req: Request) => {
   try {
     const swishRequest : SwishRequest = await req.json();
+
+    await swishSchema.validate(swishRequest);
 
     const data = await CreateSwishPayment({
       reference: swishRequest.reference,
