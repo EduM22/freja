@@ -1,5 +1,5 @@
 import { encode } from "./deps.ts";
-import { DOMAIN, PAYEE, SHARED_SECRET } from "./secrets.ts";
+import { DOMAIN, PAYEE, SHARED_SECRET, SWISH_DOMAIN } from "./secrets.ts";
 
 export async function CreateSwishPayment(params: {
   message: string;
@@ -50,7 +50,7 @@ export async function CreateSwishPayment(params: {
   };
 
   const response = await fetch(
-    `https://mss.cpc.getswish.net/swish-cpcapi/api/v2/paymentrequests/${instructionId}`,
+    `https://${SWISH_DOMAIN}/api/v2/paymentrequests/${instructionId}`,
     {
       client,
       method: "PUT",

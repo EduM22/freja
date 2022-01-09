@@ -5,6 +5,7 @@ const env = Deno.env.get("ENVIRONMENT") ?? "dev";
 let DOMAIN: string | undefined;
 let PAYEE: string | undefined;
 let SHARED_SECRET: string | undefined;
+let SWISH_DOMAIN: string | undefined;
 
 if (env == "prod") {
   DOMAIN = Deno.env.get("PROD_DOMAIN");
@@ -21,6 +22,11 @@ if (env == "prod") {
   if (!SHARED_SECRET) {
     throw new Error("environment variable PROD_SHARED_SECRET not set");
   }
+
+  SWISH_DOMAIN = Deno.env.get("PROD_SWISH_DOMAIN");
+  if (!SWISH_DOMAIN) {
+    throw new Error("environment variable PROD_SWISH_DOMAIN not set");
+  }
 } else {
   DOMAIN = Deno.env.get("DEV_DOMAIN");
   if (!DOMAIN) {
@@ -36,6 +42,11 @@ if (env == "prod") {
   if (!SHARED_SECRET) {
     throw new Error("environment variable DEV_SHARED_SECRET not set");
   }
+
+  SWISH_DOMAIN = Deno.env.get("DEV_SWISH_DOMAIN");
+  if (!SWISH_DOMAIN) {
+    throw new Error("environment variable DEV_SWISH_DOMAIN not set");
+  }
 }
 
-export { DOMAIN, PAYEE, SHARED_SECRET };
+export { DOMAIN, PAYEE, SHARED_SECRET, SWISH_DOMAIN };

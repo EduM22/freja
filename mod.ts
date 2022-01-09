@@ -1,17 +1,20 @@
 import { CreateSwishPayment } from "./swish.ts";
 import { encode, Router, serve } from "./deps.ts";
 import { SHARED_SECRET } from "./secrets.ts";
+import { SwishCallbackResponse, SwishRequest } from "./types.ts";
 
 const router = Router();
 
 // @ts-ignore The method is not defined in types
-router.get("*", async (_: Request) => {
+router.post("/pay", async (req: Request) => {
   try {
+    const swishRequest : SwishRequest = await req.json();
+
     const data = await CreateSwishPayment({
-      reference: "0123456789",
-      amount: "100",
-      message: "Kingston USB Flash Drive 8 GB",
-      payer: "4671234768",
+      reference: swishRequest.reference,
+      amount: swishRequest.amount,
+      message: swishRequest.message,
+      payer: swishRequest.payer,
     });
 
     return new Response(JSON.stringify(data), { status: 200 });
@@ -23,14 +26,13 @@ router.get("*", async (_: Request) => {
 // @ts-ignore The method is not defined in types
 router.post("/hook/:id", async (req: Request) => {
   try {
-    await req.json();
+    const swishCallback : SwishCallbackResponse = await req.json();
 
     // @ts-expect-error not on Request
     const { id } = req.params;
 
-    const instructionId = "";
     const encodedData = new TextEncoder().encode(JSON.stringify({
-      id: instructionId,
+      id: swishCallback.id,
     }));
     const encoded = encode(encodedData);
     const encDataNSecret = encode(
