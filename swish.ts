@@ -1,5 +1,5 @@
 import { encode } from "./deps.ts";
-import { DOMAIN, PAYEE, SHARED_SECRET, SWISH_DOMAIN } from "./secrets.ts";
+import { DOMAIN, PAYEE, SHARED_SECRET, SWISH_CA, SWISH_DOMAIN, SWISH_PRIVATE, SWISH_PUBLIC } from "./secrets.ts";
 
 export async function CreateSwishPayment(params: {
   message: string;
@@ -7,13 +7,10 @@ export async function CreateSwishPayment(params: {
   payer: string;
   reference: string;
 }) {
-  const caCert = await Deno.readTextFile("./cert/ca.pem");
-  const cert = await Deno.readTextFile("./cert/public.pem");
-  const privateKey = await Deno.readTextFile("./cert/private.pem");
   const client = Deno.createHttpClient({
-    caCerts: [caCert],
-    certChain: cert,
-    privateKey: privateKey,
+    caCerts: [SWISH_CA!],
+    certChain: SWISH_PUBLIC!,
+    privateKey: SWISH_PRIVATE!,
   });
 
   const id = crypto.randomUUID();
