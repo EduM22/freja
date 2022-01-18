@@ -1,14 +1,18 @@
-import { CreateSwishPayment } from "./swish.ts";
 import { encode, Router, serve } from "./deps.ts";
-import { SHARED_SECRET } from "./secrets.ts";
-import { SwishCallbackResponse, SwishRequest, swishSchema } from "./utils.ts";
+import { CreateSwishPayment } from "./utils/swish.ts";
+import { SHARED_SECRET } from "./utils/secrets.ts";
+import {
+  SwishCallbackResponse,
+  SwishRequest,
+  swishSchema,
+} from "./utils/utils.ts";
 
 const router = Router();
 
 // @ts-ignore The method is not defined in types
 router.post("/pay", async (req: Request) => {
   try {
-    const swishRequest : SwishRequest = await req.json();
+    const swishRequest: SwishRequest = await req.json();
 
     await swishSchema.validate(swishRequest);
 
@@ -28,7 +32,7 @@ router.post("/pay", async (req: Request) => {
 // @ts-ignore The method is not defined in types
 router.post("/hook/:id", async (req: Request) => {
   try {
-    const swishCallback : SwishCallbackResponse = await req.json();
+    const swishCallback: SwishCallbackResponse = await req.json();
 
     // @ts-expect-error not on Request
     const { id } = req.params;
@@ -56,6 +60,9 @@ router.post("/hook/:id", async (req: Request) => {
     if (id !== hashHex) {
       throw new Error("Not same hash");
     }
+
+    // do something with the data
+    // set payment complete in db
 
     return new Response("hook", { status: 200 });
   } catch (error) {

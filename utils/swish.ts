@@ -1,5 +1,13 @@
-import { encode } from "./deps.ts";
-import { DOMAIN, PAYEE, SHARED_SECRET, SWISH_CA, SWISH_DOMAIN, SWISH_PRIVATE, SWISH_PUBLIC } from "./secrets.ts";
+import { encode } from "../deps.ts";
+import {
+  DOMAIN,
+  PAYEE,
+  SHARED_SECRET,
+  SWISH_CA,
+  SWISH_DOMAIN,
+  SWISH_PRIVATE,
+  SWISH_PUBLIC,
+} from "./secrets.ts";
 
 export async function CreateSwishPayment(params: {
   message: string;
